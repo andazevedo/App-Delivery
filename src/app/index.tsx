@@ -2,15 +2,19 @@ import {View, Text, FlatList, SectionList} from "react-native"
 import {Link} from "expo-router"
 import {Header} from "@/components/header"
 import { CategoryButton } from "@/components/category-button"
-import { CATEGORIES, MENU } from "@/utils/data/products"
+import { CATEGORIES, MENU, ProductProps } from "@/utils/data/products"
 import { useState, useRef } from "react"
 import { Product } from "@/components/product"
+import { useCartStore } from "@/stores/cart-store"
 
 
 export default function Home(){
+    const cartStore = useCartStore()
   const[category, setcategory] = useState(CATEGORIES[0])
 
-  const sectionListRef = useRef<SectionList>(null)
+  const sectionListRef = useRef<SectionList<ProductProps>>(null)
+
+  const carquantityItens  = cartStore.products.reduce((total, product) => total + product.quantity, 0)
 
 function handleCategorySelect(selectedcategory: string){
     console.log(selectedcategory)
@@ -28,7 +32,7 @@ function handleCategorySelect(selectedcategory: string){
 
     return(
         <View className="flex-1 pt-8">
-        <Header title="Faça seu pedido" cartquantityItens={4}/>
+        <Header title="Faça seu pedido" cartquantityItens={carquantityItens}/>
 
         <FlatList
         data={CATEGORIES}
@@ -54,7 +58,6 @@ function handleCategorySelect(selectedcategory: string){
             <Link href={`/product/${item.id}`} asChild>
               <Product data={item}></Product>
             </Link>
-          
         )}
         renderSectionHeader={({section: {title}}) => (
             <Text className= "text-xl text-white font-heading mt-8 mb-3">
